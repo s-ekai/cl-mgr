@@ -13,6 +13,24 @@ Bases on [cl-dbi](https://github.com/fukamachi/cl-dbi)
 ;; if you want to rollback
 (mgr:rollback! "full migration-file path")
 ```
+
+ex) create users migration file
+```
+(in-package :cl-user)
+(defpackage :3770156273_create_users
+  (:use :cl
+        :mgr))
+(in-package :3770156273_create_users)
+
+(defup
+   (create-table "users")
+   (add-column "users" "name" "varchar(255)")
+)
+
+(defdown
+   (drop-table "users")
+)
+```
 ## Installation
 ```
  (asdf:load-system :mgr)
