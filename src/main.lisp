@@ -11,12 +11,13 @@
         :defup
         :defdown
         :create
-	:migrate!
-	:rollback!
-	:create-table
-	:add-column
-	:drop-table
-	:drop-column)
+        :migrate!
+        :rollback!
+        :create-table
+        :add-column
+        :drop-table
+        :drop-column
+        :change-column)
   )
 (in-package :mgr)
 
@@ -45,7 +46,7 @@
 ;;
 ;;(defun down ()
 ;;  (list
-;;    (drop-table :users))) 
+;;    (drop-table :users)))
 ;; ----------------------------------------------
 
 ; TODO
@@ -53,13 +54,9 @@
 ;add_foreign_key
 ;add_reference
 ;add_timestamps
-;change_column_default
-;change_column_null
 ;create_join_table
-;create_table
 ;disable_extension
 ;drop_join_table
-;drop_table
 ;enable_extension
 ;remove_column
 ;remove_foreign_key
@@ -70,7 +67,7 @@
 ;rename_index
 ;rename_table
 
-(defun connect-db (driver name username password)
+(defun connect-db (&key driver name username password)
   (defvar *connection*
     (dbi:connect driver
                  :database-name name
@@ -122,14 +119,34 @@
   (format nil "DROP TABLE ~a" name)
 )
 
-(defun add-column (table name datatype)
- (format nil "ALTER TABLE ~a ADD ~a ~a" table name datatype)
+;; so dirty, i have to rewrite ...
+(defun add-column (&key table column-name datatype null-false default-value)
+  (let
+    ((query (format nil "ALTER TABLE ~a ADD COLUMN ~a ~a" table column-name datatype)))
+    (progn
+      (if null-false
+         (setf query (concatenate 'string query " NOT NUll"))
+         query)
+      (if default-value
+         (setf query (concatenate 'string query " DEFAULT " (write-to-string default-value)))
+         query))))
+
+(defun drop-column (&key table column-name)
+ (format nil "ALTER TABLE ~a drop DROP COLUMN ~a" table column-name)
 )
 
-(defun drop-column (table name)
- (format nil "ALTER TABLE ~a drop DROP COLUMN ~a" table name)
-)
-
-(defun add-index(table column-name index-name)
+(defun add-index (&key table column-name index-name)
  (format nil "ALTER TABLE ~a ADD INDEX ~a(~a)" table index-name column-name)
 )
+
+;; so dirty, i have to rewrite ...
+(defun change-column (&key table column-name datatype null-false default-value)
+  (let
+    ((query (format nil "ALTER TABLE ~a MODIFY ~a ~a" table column-name datatype)))
+    (progn
+      (if null-false
+         (setf query (concatenate 'string query " NOT NUll"))
+         query)
+      (if default-value
+         (setf query (concatenate 'string query " DEFAULT " (write-to-string default-value)))
+         query))))

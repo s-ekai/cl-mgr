@@ -5,8 +5,8 @@ Bases on [cl-dbi](https://github.com/fukamachi/cl-dbi)
 ## Usage
 ```
 ;; connect your database
-(mgr:connect-db "mysql" "database-name" "username" "password")
-;; create migration file. 
+(mgr:connect-db :driver "mysql" :name "database-name" :username "username" :password "password")
+;; create migration file.
 (mgr:create "create_users")
 ;; execute migration file
 (mgr:migrate! "full migration-file path")
@@ -24,7 +24,7 @@ ex) create users migration file
 
 (defup
    (create-table "users")
-   (add-column "users" "name" "varchar(255)")
+   (add-column :table "users" :column-name "name" :datatype "varchar(255)")
 )
 
 (defdown

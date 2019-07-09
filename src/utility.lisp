@@ -16,10 +16,10 @@
                      :if-exists :supersede
                      :if-does-not-exist :create)
   (format migration-file (default-migration-content filename)))
-    
+
     ))
 
-(defun default-migration-content (filename)  
+(defun default-migration-content (filename)
 (format nil "
 (in-package :cl-user)
 (defpackage :~a
@@ -30,7 +30,7 @@
 
 (defup
    (create-table \"users\")
-   (add-column \"users\" \"name\" \"varchar(255)\")
+   (add-column :table \"users\" :column-name \"name\" :datatype \"varchar(255)\")
  )
 
 (defdown
@@ -41,4 +41,3 @@
 (defun get-migration-name (path)
    (svref (nth-value 1 (ppcre:scan-to-strings "/([^\/.]+).lisp" path)) 0)
   )
-
